@@ -114,7 +114,8 @@ class TibetanSanskritTransliterator:
         # Fix double vowel issues from overlapping replacements
         # e.g., 'aā' -> 'ā', 'aī' -> 'ī', etc.
         result = re.sub(r'a([āīūṛṝḷḹ])', r'\1', result)
-        result = re.sub(r'a([ṃṁ])', r'\1', result)  # aṃ -> ṃ when preceded by vowel
+        # Only remove 'a' before anusvara when preceded by another vowel (e.g., 'āaṃ' -> 'āṃ')
+        result = re.sub(r'([āīūaiueo])a([ṃṁ])', r'\1\2', result)
         
         # Handle capitalization
         if capitalize:
