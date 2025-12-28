@@ -20,6 +20,27 @@ def normalize_tibetan(tibetan: str, keep_trailing_tshek: bool = False) -> str:
     # Normalize Unicode
     normalized = unicodedata.normalize('NFC', tibetan)
     
+    # Normalize combined letters (ported from tibetan-normalizer JS)
+    normalized = normalized.replace(' ', ' ')  # Non-breaking space
+    normalized = normalized.replace('ༀ', 'ཨོཾ')  # Om symbol
+    normalized = normalized.replace('ཀྵ', 'ཀྵ')
+    normalized = normalized.replace('བྷ', 'བྷ')
+    normalized = re.sub(r'ི+', 'ི', normalized)  # Multiple i vowels
+    normalized = re.sub(r'ུ+', 'ུ', normalized)  # Multiple u vowels
+    normalized = normalized.replace('ཱུ', 'ཱུ')
+    normalized = normalized.replace('ཱི', 'ཱི')
+    normalized = normalized.replace('ཱྀ', 'ཱྀ')
+    normalized = normalized.replace('དྷ', 'དྷ')
+    normalized = normalized.replace('གྷ', 'གྷ')
+    normalized = normalized.replace('ཪླ', 'རླ')
+    normalized = normalized.replace('ྡྷ', 'ྡྷ')
+    
+    # Normalize tsheks (ported from tibetan-normalizer JS)
+    # Malformed: anusvara before vowel - swap them
+    normalized = re.sub(r'(ཾ)([ཱེིོྀུ])', r'\2\1', normalized)
+    normalized = normalized.replace('༌', '་')  # Alternative tshek
+    normalized = re.sub(r'་+', '་', normalized)  # Multiple consecutive tsheks
+    
     # Replace various punctuation with tshek
     normalized = re.sub(r'[༵\u0F04-\u0F0A\u0F0D-\u0F1F\u0F3A-\u0F3F\u0FBE-\uF269]', '་', normalized)
     normalized = normalized.strip()
