@@ -5,7 +5,7 @@ Main transliterator class for Tibetan Sanskrit to IAST/phonetics conversion.
 import re
 from typing import Optional, Literal
 
-from .loader import load_replacements
+from tibetan_sanskrit_transliteration_data import load_replacements
 from .normalizer import normalize_tibetan, normalize_iast
 
 
@@ -17,14 +17,11 @@ class TibetanSanskritTransliterator:
     # Tibetan vowel markers that override the inherent 'a'
     VOWEL_MARKERS = '\u0f71\u0f72\u0f74\u0f7a\u0f7c\u0f7e\u0f80'
     
-    def __init__(self, csv_path: Optional[str] = None):
+    def __init__(self):
         """
         Initialize the transliterator.
-        
-        Args:
-            csv_path: Optional path to custom replacements CSV file.
         """
-        raw_replacements = load_replacements(csv_path)
+        raw_replacements = load_replacements()
         # Preprocess Tibetan patterns and pre-compile regex
         self.replacements = []
         for entry in raw_replacements:
@@ -137,20 +134,16 @@ class TibetanSanskritTransliterator:
 _default_transliterator: Optional[TibetanSanskritTransliterator] = None
 
 
-def get_transliterator(csv_path: Optional[str] = None) -> TibetanSanskritTransliterator:
+def get_transliterator() -> TibetanSanskritTransliterator:
     """
     Get or create a singleton transliterator instance.
-    
-    Args:
-        csv_path: Optional path to custom replacements CSV file.
-                  Only used on first call; ignored if instance already exists.
         
     Returns:
         TibetanSanskritTransliterator instance
     """
     global _default_transliterator
     if _default_transliterator is None:
-        _default_transliterator = TibetanSanskritTransliterator(csv_path)
+        _default_transliterator = TibetanSanskritTransliterator()
     return _default_transliterator
 
 
