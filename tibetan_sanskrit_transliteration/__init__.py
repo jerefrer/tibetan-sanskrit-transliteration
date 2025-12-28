@@ -6,5 +6,5 @@ A Python library for transliterating Tibetan-encoded Sanskrit mantras to IAST an
 
 from .transliterator import TibetanSanskritTransliterator, transliterate
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __all__ = ["TibetanSanskritTransliterator", "transliterate"]
