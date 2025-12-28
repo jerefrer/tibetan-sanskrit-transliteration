@@ -5,23 +5,47 @@ set -e
 
 echo "🔄 Publishing tibetan-sanskrit-transliteration..."
 
-# Check if version argument is provided
+# Check if bump type argument is provided
 if [ -z "$1" ]; then
-    echo "❌ Error: Version argument required"
-    echo "Usage: ./publish.sh <version>"
-    echo "Example: ./publish.sh 0.1.3"
+    echo "❌ Error: Version bump type required"
+    echo "Usage: ./publish.sh <major|minor|patch>"
+    echo "Example: ./publish.sh patch"
     exit 1
 fi
 
-NEW_VERSION=$1
+BUMP_TYPE=$1
 
-# Validate version format (basic check)
-if ! [[ $NEW_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    echo "❌ Error: Invalid version format. Use semantic versioning (e.g., 0.1.3)"
+# Validate bump type
+if [[ ! "$BUMP_TYPE" =~ ^(major|minor|patch)$ ]]; then
+    echo "❌ Error: Invalid bump type. Use 'major', 'minor', or 'patch'"
     exit 1
 fi
 
-echo "📝 Bumping version to $NEW_VERSION..."
+# Get current version from pyproject.toml
+CURRENT_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+
+# Parse version components
+IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+
+# Bump version based on type
+case $BUMP_TYPE in
+    major)
+        MAJOR=$((MAJOR + 1))
+        MINOR=0
+        PATCH=0
+        ;;
+    minor)
+        MINOR=$((MINOR + 1))
+        PATCH=0
+        ;;
+    patch)
+        PATCH=$((PATCH + 1))
+        ;;
+esac
+
+NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+
+echo "📝 Bumping version from $CURRENT_VERSION to $NEW_VERSION ($BUMP_TYPE)..."
 
 # Update version in pyproject.toml
 sed -i '' "s/^version = \".*\"/version = \"$NEW_VERSION\"/" pyproject.toml
